@@ -1,0 +1,80 @@
+formatter: "markdown table"
+
+content: |-
+  # AWS REST API gateway module
+  
+  # Example usage:
+  ```hcl
+    module "api" {
+      source           = "../"
+      api_gateway_name = "api"
+
+      environment = "dev"
+      stage_name  = "v1"
+
+      endpoint_configuration = {
+        types = ["EDGE"]
+      }
+
+      integrations = [
+        {
+          integration_type        = "AWS_PROXY"
+          uri                     = "arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-central-1:123456789101:function:get_users/invocations"
+          http_method             = "GET"
+          integration_http_method = "POST"
+          path_part               = "user"
+        },
+        {
+          integration_type        = "HTTP"
+          uri                     = "https://google.com/"
+          http_method             = "GET"
+          integration_http_method = "GET"
+          path_part               = "group"
+          request_parameters = {
+            "integration.request.header.X-Authorization" = "'static'"
+            "integration.request.header.X-Foo"           = "'Bar'"
+          }
+          request_templates = {
+            "application/json" = ""
+            "application/xml"  = "#set($inputRoot = $input.path('$'))\n{ }"
+          }
+          passthrough_behavior = "WHEN_NO_MATCH"
+          content_handling     = "CONVERT_TO_TEXT"
+          authorization        = "CUSTOM"
+        },
+        {
+          integration_type     = "MOCK"
+          http_method          = "GET"
+          path_part            = "mock"
+          request_parameters = {
+            "integration.request.header.X-Authorization" = "'static'"
+          }
+          request_templates = {
+            "application/xml" = <<EOF
+        {
+          "body" : $input.json('$')
+        }
+              EOF
+          }
+        }
+      ]
+    }
+  ```
+
+  {{ .Header }}
+
+  {{ .Providers }}
+  
+  {{ .Outputs }}
+  
+  {{ .Inputs }} 
+
+output:
+  file: "README.md"
+  mode: replace
+  template: |-
+    {{ .Content }}
+
+sort:
+  enabled: true
+  by: required
