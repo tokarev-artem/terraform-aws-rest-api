@@ -3,7 +3,8 @@
 # Example usage:
 ```hcl
   module "api" {
-    source           = "../"
+    source  = "tokarev-artem/rest-api/aws"
+
     api_gateway_name = "api"
 
     environment = "dev"

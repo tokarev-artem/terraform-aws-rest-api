@@ -8,7 +8,7 @@ resource "aws_api_gateway_rest_api" "this" {
   dynamic "endpoint_configuration" {
     for_each = var.endpoint_configuration != null ? [var.endpoint_configuration] : []
     content {
-      types = endpoint_configuration.value.types
+      types            = endpoint_configuration.value.types
       vpc_endpoint_ids = contains(endpoint_configuration.value.types, "PRIVATE") ? endpoint_configuration.value.vpc_endpoint_ids : null
     }
   }
@@ -230,5 +230,4 @@ resource "aws_iam_role_policy" "invocation_policy" {
   name   = "allow-lambda-auth-invocation"
   role   = aws_iam_role.invocation_role[0].id
   policy = data.aws_iam_policy_document.invocation_policy[0].json
-
 }
